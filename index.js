@@ -31,13 +31,13 @@ class Projectile {
         this.color = color
         this.velocity = velocity
     }
-      draw() {
+    draw() {
         c.beginPath()
-        c.arc(this.x, this.y, this.radius, 0, Math.PI *2 , false)
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
         c.fillStyle = this.color
         c.fill()
     }
-    update(){
+    update() {
         this.draw()
         this.x = this.x + this.velocity.x
         this.y = this.y + this.velocity.y
@@ -53,13 +53,13 @@ class Enemy {
         this.color = color
         this.velocity = velocity
     }
-      draw() {
+    draw() {
         c.beginPath()
-        c.arc(this.x, this.y, this.radius, 0, Math.PI *2 , false)
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
         c.fillStyle = this.color
         c.fill()
     }
-    update(){
+    update() {
         this.draw()
         this.x = this.x + this.velocity.x
         this.y = this.y + this.velocity.y
@@ -78,75 +78,87 @@ const enemies = []
 
 
 //spawRnemies
-function spawEnemies(){
-    setInterval(()=>{
-        const radius = Math.random() * (30-4) + 4
+function spawEnemies() {
+    setInterval(() => {
+        const radius = Math.random() * (30 - 10) + 10
 
         let x
         let y
 
-        if(Math.random() < 0.5){
-            x = Math.random() < 0.5 ? 0 - radius : canvas.width+radius
+        if (Math.random() < 0.5) {
+            x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius
             y = Math.random() * canvas.height
-        /* const x = Math.random() < 0.5 ? 0 - radius : canvas.width+radius
-        const y = Math.random() < 0.5 ? 0 - radius : canvas.height+radius */
-        } else{
+            /* const x = Math.random() < 0.5 ? 0 - radius : canvas.width+radius
+            const y = Math.random() < 0.5 ? 0 - radius : canvas.height+radius */
+        } else {
             x = Math.random() * canvas.width
-            y = Math.random() < 0.5 ? 0 - radius : canvas.height+radius
+            y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius
         }
         const color = 'green'
-     
+
         const angle = Math.atan2(
-          canvas.height/2 - y , 
-           canvas.width/2 - x , 
-            )
+            canvas.height / 2 - y,
+            canvas.width / 2 - x,
+        )
 
         const velocity = {
-            x: Math.cos(angle) ,
+            x: Math.cos(angle),
             y: Math.sin(angle)
         }
-        enemies.push(new Enemy(x, y, radius, color, velocity ))
+        enemies.push(new Enemy(x, y, radius, color, velocity))
         console.log(enemies)
-    },900)
+    }, 900)
 }
 //End spawRnemies
 
-
-function animate(){
+//Início animação
+function animate() {
     requestAnimationFrame(animate)
     c.clearRect(0, 0, canvas.width, canvas.height)
     player.draw()
-    projectiles.forEach((projectile)=>{
+    projectiles.forEach((projectile) => {
         projectile.update()
     })
 
-    enemies.forEach(enemy => {
+    enemies.forEach((enemy, index) => {
         enemy.update()
+        projectiles.forEach((projectile, projetileIndex) => {
+            const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y)
+
+            //objects touch
+            if (dist - enemy.radius - projectile.radius < 1) {
+
+                setTimeout(() => {
+                    enemies.splice(index, 1)
+                    projectiles.splice(projetileIndex, 1)
+                }, 0)
+
+            }
+        });
     })
 }
+//fim Animação
+addEventListener('click', (event) => {
+    const angle = Math.atan2(
+        event.clientY - canvas.height / 2,
+        event.clientX - canvas.width / 2,
+    )
 
-addEventListener('click', (event) => 
-    {
-        const angle = Math.atan2(
-            event.clientY - canvas.height/2, 
-            event.clientX - canvas.width/2, 
-            )
+    const velocity = {
+        x: Math.cos(angle),
+        y: Math.sin(angle)
+    }
 
-        const velocity = {
-            x: Math.cos(angle) ,
-            y: Math.sin(angle)
-        }
-
-        projectiles.push(
-            new Projectile(
-                canvas.width / 2,
-                canvas.height / 2,
-                5,
-                'red',
-               velocity
-                )
+    projectiles.push(
+        new Projectile(
+            canvas.width / 2,
+            canvas.height / 2,
+            5,
+            'red',
+            velocity
         )
-    })
+    )
+})
 
- animate() 
- spawEnemies()
+animate()
+spawEnemies()
