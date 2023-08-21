@@ -69,13 +69,45 @@ class Enemy {
 
 
 
+//Criando particulas de destruição
+const friction = 0.99
+class Particle {
+    constructor(x, y, radius, color, velocity) {
+        this.x = x
+        this.y = y
+        this.radius = radius
+        this.color = color
+        this.velocity = velocity
+        this.alpha = 1
+    }
+    draw() {
+        c.save()
+        c.globalAlpha = this.alpha
+        c.beginPath()
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+        c.fillStyle = this.color
+        c.fill()
+        c.restore()
+    }
+    update() {
+        this.draw()
+        this.velocity.x *= friction
+        this.velocity.y *= friction
+        this.x = this.x + this.velocity.x
+        this.y = this.y + this.velocity.y
+        this.alpha -= 0.01
+    }
+}
+
+
+
 const x = canvas.width / 2
 const y = canvas.height / 2
 
 const player = new Player(x, y, 10, 'gray')
 const projectiles = []
-
 const enemies = []
+const particles = []
 
 
 //spawEnemies
@@ -118,9 +150,17 @@ function spawEnemies() {
 let animationId
 function animate() {
     animationId = requestAnimationFrame(animate)
-    c.fillStyle ='rgba(0, 0, 0, 0.1)'
+    c.fillStyle = 'rgba(0, 0, 0, 0.1)'
     c.fillRect(0, 0, canvas.width, canvas.height)
     player.draw()
+    particles.forEach((particle,  index) => {
+        if(particle.alpha <= 0){
+            particles.splice( index, 1)
+        } else{
+            particle.update()
+        }
+ 
+    });
 
     projectiles.forEach((projectile, index) => {
         projectile.update()
@@ -129,7 +169,7 @@ function animate() {
         if (projectile.x + projectile.radius < 0 ||
             projectile.x - projectile.radius > canvas.width ||
             projectile.y + projectile.radius < 0 ||
-            projectile.y - projectile.radius >canvas.height) {
+            projectile.y - projectile.radius > canvas.height) {
             setTimeout(() => {
 
                 projectiles.splice(index, 1)
@@ -153,19 +193,35 @@ function animate() {
             const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y)
 
             // Quando os tiros colidirem com os inimigos
-            if (dist - enemy.radius - projectile.radius < 1)
-             {
+            if (dist - enemy.radius - projectile.radius < 1) {
+             
+            
+                //criando particulas de destruição
+                for (let i = 0; i < enemy.radius * 2 ; i++) {
+                    particles.push(
+                        new Particle(
+                            projectile.x,
+                            projectile.y,
+                            Math.random() * 2,
+                            enemy.color,
+                            {
+                                x: (Math.random() - 0.5)*(Math.random() * 2),
+                                y: (Math.random() - 0.5)*(Math.random() * 2)
+                            })
+                    )
+                }
+                //fim criando particulas de destruição
 
-                if(enemy.radius - 10 > 10){
+                if (enemy.radius - 10 > 10) {
                     gsap.to(enemy, {
-                        radius:enemy.radius -10
+                        radius: enemy.radius - 10
                     })
-                    
+
                     /* enemy.radius -= 10 *///elimina o inimigo
                     setTimeout(() => {
                         projectiles.splice(projetileIndex, 1)
                     }, 0)
-                }else{
+                } else {
 
                     setTimeout(() => {
                         enemies.splice(index, 1)
@@ -174,7 +230,7 @@ function animate() {
                 }
 
             } // Fim de Quando os tiros colidirem com os inimigos
-            
+
         });
     })
 }
@@ -189,15 +245,15 @@ addEventListener('click', (event) => {
     )
 
     const velocity = {
-        x: Math.cos(angle)*4 ,
-        y: Math.sin(angle) *4
+        x: Math.cos(angle) * 4,
+        y: Math.sin(angle) * 4
     }
 
     projectiles.push(
         new Projectile(
             canvas.width / 2,
             canvas.height / 2,
-             1,
+            1,
             'orange',
             velocity
         )
