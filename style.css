@@ -7,14 +7,38 @@
 body{
     margin: 0;
 }
-.content{
-    display: flex;
+.content, .gameOver{
 
+    background-color: black;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);   
 
+}
+
+.gameOver{
+    background-color: white;
+    width: 30%;
+    text-align: center;
+    padding: 20px;
+    border-radius: 5px;
+}
+.gameOver button{
+    padding: 10px 20px;
+    background-color: rgb(45, 113, 207);
+    border:1px solid rgb(4, 26, 57);
+    border-radius: 5px;
+    margin: 10px;
+    color: white;
+    font-weight: bolder;
+    font-size: 1em;
+}
+
+.gameOver button:hover{
+    background-color: rgb(6, 183, 41);
+    border:1px solid rgb(28, 130, 42);
+    cursor: pointer;
 }
 
 

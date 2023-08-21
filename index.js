@@ -7,7 +7,14 @@ canvas.height = innerHeight/2
 
 //Score
 const scoreEl = document.querySelector('#scoreEl');
-console.log(scoreEl)
+
+//Start btn
+const startGameBtn = document.querySelector("#startGameBtn");
+
+//janela de iniciação do game
+const modelEl = document.querySelector("#modelEl");
+
+
 
 
 class Player {
@@ -274,5 +281,10 @@ addEventListener('click', (event) => {
     )
 })
 
-animate()
+
+startGameBtn.addEventListener('click',()=>{
+    animate()
 spawEnemies()
+
+modelEl.style.display ='none'
+})
