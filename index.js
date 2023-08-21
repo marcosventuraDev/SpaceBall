@@ -1,11 +1,13 @@
 console.log(gsap)
 const canvas = document.querySelector('canvas');
-const c = canvas.getContext('2d')
+const c = canvas.getContext('2d');
 
+canvas.width = innerWidth /2
+canvas.height = innerHeight/2
 
-
-canvas.width = innerWidth
-canvas.height = innerHeight
+//Score
+const scoreEl = document.querySelector('#scoreEl');
+console.log(scoreEl)
 
 
 class Player {
@@ -70,7 +72,7 @@ class Enemy {
 
 
 //Criando particulas de destruição
-const friction = 0.99
+const friction = 0.98
 class Particle {
     constructor(x, y, radius, color, velocity) {
         this.x = x
@@ -148,6 +150,7 @@ function spawEnemies() {
 
 //Início animação
 let animationId
+let score = 0
 function animate() {
     animationId = requestAnimationFrame(animate)
     c.fillStyle = 'rgba(0, 0, 0, 0.1)'
@@ -194,7 +197,8 @@ function animate() {
 
             // Quando os tiros colidirem com os inimigos
             if (dist - enemy.radius - projectile.radius < 1) {
-             
+
+            
             
                 //criando particulas de destruição
                 for (let i = 0; i < enemy.radius * 2 ; i++) {
@@ -213,6 +217,11 @@ function animate() {
                 //fim criando particulas de destruição
 
                 if (enemy.radius - 10 > 10) {
+                     // acrescentando o score quando atacar o inimigo
+                score += 1;
+                scoreEl.innerHTML = score
+                console.log(score)
+
                     gsap.to(enemy, {
                         radius: enemy.radius - 10
                     })
@@ -222,7 +231,10 @@ function animate() {
                         projectiles.splice(projetileIndex, 1)
                     }, 0)
                 } else {
-
+                    // acrescentando o score quando matar o inimigo
+                    score += 10;
+                    scoreEl.innerHTML = score
+                    console.log(score)
                     setTimeout(() => {
                         enemies.splice(index, 1)
                         projectiles.splice(projetileIndex, 1)
@@ -240,8 +252,10 @@ addEventListener('click', (event) => {
 
 
     const angle = Math.atan2(
-        event.clientY - canvas.height / 2,
-        event.clientX - canvas.width / 2,
+     /*    event.clientY - canvas.height / 2,
+        event.clientX - canvas.width / 2, */
+        event.clientY - canvas.height,
+        event.clientX - canvas.width,
     )
 
     const velocity = {
